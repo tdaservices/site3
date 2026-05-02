@@ -1,0 +1,61 @@
+.content2{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 4vmin;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-inline: auto;
+    color: black;
+    margin-bottom: 15vh;
+    margin-top: 2vh;
+}
+
+input, textarea {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    color: black;
+}
+textarea{
+    height: 20vh;
+    resize: none;
+}
+button {
+    padding: 10px;
+    background: var(--c1);
+    border: none;
+    cursor: pointer;
+    color: white;
+}
+
+h2{
+    text-align: center;
+    font-size: 2rem;
+}
+
+
+
+@media (width>1000px) {
+    form {
+        width: 100vmin;
+    }
+    button:hover{
+        filter: brightness(120%);
+        box-shadow: 0 0 25px white;
+        transform: translateY(-10px);
+    }
+    h1{
+        width: 60%;
+        margin-inline: auto;
+    }
+    input:hover, textarea:hover {
+        border: 1px solid var(--c1);
+        transform: scale(1.02);
+        color: var(--c1);
+    }
+}
