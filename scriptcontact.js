@@ -1,5 +1,5 @@
 (function(){
-    emailjs.init("L67d0KsHzyj4mLzXc");
+    emailjs.init("-Qmqar30LPSa43TjM");
 })();
 
 const form = document.getElementById("contact-form");
@@ -24,10 +24,11 @@ form.addEventListener("submit", function(e) {
     const params = {
         user_name: nom,
         user_email: email,
-        message: message
+        message: message,
+        time: new Date().toLocaleString()
     };
 
-    emailjs.send("service_kigr06u", "template_t57o7nw", params)
+    emailjs.send("service_kwwzkxd", "template_p0pf2rc", params)
     .then(function(response) {
         alert("✅ Message envoyé avec succès ! Nous vous recontactons dès que possible !");
         form.reset();
