@@ -1,11 +1,11 @@
-(function(){
-    emailjs.init("L67d0KsHzyj4mLzXc");
+(function () {
+    emailjs.init("-Qmqar30LPSa43TjM");
 })();
 
-document.querySelectorAll("button").forEach(btn => {
+document.querySelectorAll(".service button").forEach(btn => {
     btn.addEventListener("click", () => {
 
-        const DELAI_ANTI_SPAM = 30 * 60 * 1000; // 30 minutes
+        const DELAI_ANTI_SPAM = 30 * 60 * 1000;
 
         function ask(question, validator = null, transform = null) {
             let value;
@@ -20,19 +20,14 @@ document.querySelectorAll("button").forEach(btn => {
 
                 value = value.trim();
 
-                if (transform) {
-                    value = transform(value);
-                }
+                if (transform) value = transform(value);
 
-                if (!validator || validator(value)) {
-                    return value;
-                }
+                if (!validator || validator(value)) return value;
 
                 alert("❌ Format invalide, veuillez réessayer.");
             }
         }
 
-        // 🔤 Normalisation des noms
         function normalizeName(str) {
             return str
                 .toLowerCase()
@@ -46,73 +41,81 @@ document.querySelectorAll("button").forEach(btn => {
             let lastSend = localStorage.getItem("lastEmailSend");
 
             if (lastSend) {
-                let now = Date.now();
-                let diff = now - parseInt(lastSend);
+                let diff = Date.now() - parseInt(lastSend);
 
                 if (diff < DELAI_ANTI_SPAM) {
-                    let minutesRestantes = Math.ceil((DELAI_ANTI_SPAM - diff) / 60000);
-                    alert("⏳ Vous devez attendre encore " + minutesRestantes + " minute(s) avant de renvoyer une demande.");
+                    let minutes = Math.ceil((DELAI_ANTI_SPAM - diff) / 60000);
+                    alert("⏳ Attendez encore " + minutes + " minute(s).");
                     return;
                 }
             }
 
-            let nom = ask(
-                "Entrez votre nom :",
-                val => val.length >= 2,
-                normalizeName
-            );
+            // 🎯 Récupération du service cliqué
+            let serviceDiv = btn.closest(".service");
 
-            let prenom = ask(
-                "Entrez votre prénom :",
-                val => val.length >= 2,
-                normalizeName
-            );
+            if (!serviceDiv) {
+                console.error("Service introuvable");
+                return;
+            }
+
+            let serviceName = serviceDiv.querySelector("h3")?.textContent || "Inconnu";
+            let adresse = serviceDiv.querySelectorAll("p")[1]?.textContent || "Inconnue";
+
+            console.log("Service sélectionné :", serviceName);
+            console.log("Adresse :", adresse);
+
+            // 👤 Infos utilisateur
+            let nom = ask("Nom :", v => v.length >= 2, normalizeName);
+            let prenom = ask("Prénom :", v => v.length >= 2, normalizeName);
 
             let telephone = ask(
-                "Entrez votre numéro de téléphone (10 chiffres) :",
-                val => /^[0-9]{10}$/.test(val)
+                "Téléphone (10 chiffres) :",
+                v => /^[0-9]{10}$/.test(v)
             );
 
             let email = ask(
-                "Entrez votre email :",
-                val => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
-                val => val.toLowerCase()
+                "Email :",
+                v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+                v => v.toLowerCase()
             );
 
-            let heure = ask("Date/heure souhaitée pour l'appel :");
+            let heure = ask("Heure souhaitée :");
 
-            // ✅ RGPD - consentement obligatoire
+            // ✅ RGPD
             let consentement = confirm("J'accepte que mes données soient utilisées pour être recontacté.");
 
             if (!consentement) {
-                alert("⚠️ Vous devez accepter le traitement des données pour envoyer la demande.");
+                alert("❌ Consentement requis.");
                 return;
             }
 
             let params = {
+                service: serviceName,
+                adresse: adresse,
                 nom: nom,
                 prenom: prenom,
                 telephone: telephone,
                 email: email,
-                heure: heure
+                heure: heure,
+                time: new Date().toLocaleString()
             };
 
-            emailjs.send("service_5ujz22w", "template_l3hpmob", params)
-            .then(function(response) {
+            console.log("📤 Envoi EmailJS :", params);
 
-                // 💾 Sauvegarde anti-spam
-                localStorage.setItem("lastEmailSend", Date.now().toString());
-
-                alert("✅ Demande envoyée avec succès ! Nous ferons notre possible pour vous contacter à l'heure souhaitée.");
-
-            }, function(error) {
-                alert("❌ Erreur lors de l'envoi... Veuillez réessayer.");
-                console.log(error);
-            });
+            emailjs.send("service_kqfkmxs", "template_gcwwqhr", params)
+                .then(() => {
+                    localStorage.setItem("lastEmailSend", Date.now().toString());
+                    alert("✅ Demande envoyée !");
+                })
+                .catch(err => {
+                    console.error("❌ Erreur EmailJS :", err);
+                    alert("❌ Erreur lors de l'envoi.");
+                });
 
         } catch (e) {
-            // arrêt silencieux
+            if (e !== "cancel") {
+                console.error("❌ Erreur JS :", e);
+            }
         }
-
     });
 });
